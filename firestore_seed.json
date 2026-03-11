@@ -1,0 +1,59 @@
+{
+  "users": {
+    "demo_user": {
+      "name": "Demo User",
+      "email": "demo@mail.com",
+      "personalityType": "",
+      "photoUrl": ""
+    }
+  },
+
+  "quiz_questions": {
+    "q1": {
+      "question": "What's your ideal morning?",
+      "options": [
+        "Quiet Sunrise Hike",
+        "Bustling Local Market",
+        "Relaxed Beach Walk"
+      ],
+      "order": 1
+    },
+
+    "q2": {
+      "question": "City or Nature?",
+      "options": [
+        "Big City",
+        "Nature",
+        "Mountains"
+      ],
+      "order": 2
+    }
+  },
+
+  "quiz_responses": {
+    "demo_response": {
+      "userId": "demo_user",
+      "answers": []
+    }
+  },
+
+  "ai_results": {
+    "demo_ai": {
+      "userId": "demo_user",
+      "resultText": "Explorer traveler",
+      "images": []
+    }
+  },
+
+  "itineraries": {
+    "demo_trip": {
+      "userId": "demo_user",
+      "title": "Adventure in the Alps",
+      "places": [
+        "Zurich",
+        "Interlaken",
+        "Zermatt"
+      ]
+    }
+  }
+}

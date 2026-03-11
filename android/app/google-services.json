@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "121296896527",
+    "project_id": "personapath-d0dc6",
+    "storage_bucket": "personapath-d0dc6.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:121296896527:android:09a404c395e1cca64c997a",
+        "android_client_info": {
+          "package_name": "com.example.persona_path"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD3HDky1OV8RK2oLhzLASur5f8WwlvO0WU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
