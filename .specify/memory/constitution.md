@@ -1,50 +1,52 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
-
+# PersonaPath Constitution
 ## Core Principles
+### I. Flutter-First & Student-Friendly Code
+Every feature and screen must be written in clean, simple Flutter code that a university student can understand.  
+- Every screen is divided into clear Sections + reusable Custom Widgets.  
+- No complex code in one file.  
+- Comments in Arabic + English where needed.  
+- Maximum use of const, final, and named constructors.
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### II. Constants-First (NON-NEGOTIABLE)
+All colors, text styles, paddings, API keys, and spacing live in one file: `lib/core/constants.dart`  
+- Never hard-code colors, sizes, or strings anywhere else.  
+- Theme must be: White background (#FFFFFF), Orange primary (#FF9800 for buttons & outlines), Blue accent (#2196F3).  
+- All paddings, border radius, and animations defined as const values.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### III. Minimum 12 Screens + Custom Widgets
+The app must have at least 12 screens (use named routes).  
+Every screen = Sections of reusable Custom Widgets (QuizOptionCard, OrangeButton, ItineraryCard, BackgroundContainer, etc.).  
+Animations required: Fade, Scale, Hero on images, AnimatedOpacity on loading.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### IV. Bloc/Cubit + Firebase Only
+- State management: flutter_bloc (Cubit only – no Provider or Riverpod).  
+- Firebase: Auth (Email/Password + Google Sign-In only) + Firestore (no Storage).  
+- Collections: users + itineraries.  
+- All data saved in Firestore.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### V. AI Integration at the End
+After the 5-question quiz, send answers + fixed prompt to AI (OpenAI/Grok).  
+AI returns JSON (title, description, days, activities, imageUrls).  
+Display text + NetworkImage instantly and save everything in Firestore.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+## Additional Constraints
+- Architecture: Clean (lib/core, lib/data, lib/presentation).  
+- Assets: Use assets/icons/personapathicon.png and assets/images/background.png.  
+- Login: Only Email/Password + Google (no Apple or Facebook).  
+- Design: Modern clean UI, lots of white space, orange outlines, big buttons.  
+- No external packages except the ones we added (firebase_*, flutter_bloc, http, google_sign_in).  
+- All API keys and secrets in constants.dart only.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
-
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
-
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
-
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+## Development Workflow
+1. Read spec/personapath.md first.  
+2. Implement one screen or feature at a time.  
+3. Use Custom Widgets + constants.dart everywhere.  
+4. Add simple animations where user interacts.  
+5. After quiz → call AI → show result → save to Firestore.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
+This Constitution is the highest authority.  
+Any generated code must follow all principles above.  
+Amendments only by editing this file and re-implementing.
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
-
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Version**: 1.0 | **Ratified**: March 2026 | **Last Amended**: March 2026

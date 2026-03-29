@@ -1,0 +1,182 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:async';
+
+import '../constants.dart';
+import '../../data/models/user_profile.dart';
+import '../../presentation/cubit/auth/auth_session_cubit.dart';
+import '../../presentation/cubit/auth/google_sign_in_cubit.dart';
+import '../../presentation/cubit/auth/sign_in_cubit.dart';
+import '../../presentation/cubit/auth/sign_up_cubit.dart';
+import '../../presentation/cubit/itinerary/itinerary_cubit.dart';
+import '../../presentation/cubit/quiz/quiz_cubit.dart';
+import '../../presentation/screens/home_screen.dart';
+import '../../presentation/screens/app_shell.dart';
+import '../../presentation/screens/itinerary_detail_screen.dart';
+import '../../presentation/screens/itinerary_result_screen.dart';
+import '../../presentation/screens/loading_itinerary_screen.dart';
+import '../../presentation/screens/login_screen.dart';
+import '../../presentation/screens/my_itineraries_screen.dart';
+import '../../presentation/screens/profile_screen.dart';
+import '../../presentation/screens/quiz_intro_screen.dart';
+import '../../presentation/screens/quiz_result_screen.dart';
+import '../../presentation/screens/quiz_screen.dart';
+import '../../presentation/screens/quiz_text_screen.dart';
+import '../../presentation/screens/register_screen.dart';
+import '../../presentation/screens/splash_screen.dart';
+import '../../presentation/screens/welcome_screen.dart';
+
+class AppRouter {
+  static GoRouter createRouter() {
+    return GoRouter(
+      initialLocation: AppRoutes.splash,
+      refreshListenable: GoRouterRefreshStream(
+        FirebaseAuth.instance.authStateChanges(),
+      ),
+      routes: <RouteBase>[
+        GoRoute(
+          path: AppRoutes.splash,
+          builder: (context, state) => const SplashScreen(),
+        ),
+        GoRoute(
+          path: AppRoutes.welcome,
+          builder: (context, state) => const WelcomeScreen(),
+        ),
+        GoRoute(
+          path: AppRoutes.login,
+          builder: (context, state) => const LoginScreen(),
+        ),
+        GoRoute(
+          path: AppRoutes.register,
+          builder: (context, state) => const RegisterScreen(),
+        ),
+        GoRoute(
+          path: AppRoutes.quizIntro,
+          builder: (context, state) => const QuizIntroScreen(),
+        ),
+        GoRoute(
+          path: AppRoutes.quiz,
+          builder: (context, state) => const QuizScreen(),
+        ),
+        GoRoute(
+          path: AppRoutes.quizText,
+          builder: (context, state) => const QuizTextScreen(),
+        ),
+        GoRoute(
+          path: AppRoutes.quizResult,
+          builder: (context, state) {
+            final profile = state.extra;
+            if (profile is! UserProfile) {
+              return const Scaffold(body: Center(child: Text('No quiz result.')));
+            }
+            return QuizResultScreen(profile: profile);
+          },
+        ),
+        GoRoute(
+          path: AppRoutes.loading,
+          builder: (context, state) => const LoadingItineraryScreen(),
+        ),
+        GoRoute(
+          path: AppRoutes.itineraryResult,
+          builder: (context, state) => const ItineraryResultScreen(),
+        ),
+        StatefulShellRoute.indexedStack(
+          builder: (context, state, navigationShell) {
+            return AppShell(navigationShell: navigationShell);
+          },
+          branches: <StatefulShellBranch>[
+            StatefulShellBranch(
+              routes: <RouteBase>[
+                GoRoute(
+                  path: AppRoutes.home,
+                  builder: (context, state) => const HomeScreen(),
+                ),
+              ],
+            ),
+            StatefulShellBranch(
+              routes: <RouteBase>[
+                GoRoute(
+                  path: AppRoutes.myItineraries,
+                  builder: (context, state) => const MyItinerariesScreen(),
+                ),
+              ],
+            ),
+            StatefulShellBranch(
+              routes: <RouteBase>[
+                GoRoute(
+                  path: AppRoutes.profile,
+                  builder: (context, state) => const ProfileScreen(),
+                ),
+              ],
+            ),
+          ],
+        ),
+        GoRoute(
+          path: AppRoutes.itineraryDetail,
+          builder: (context, state) {
+            final id = state.pathParameters['id'] ?? '';
+            return ItineraryDetailScreen(itineraryId: id);
+          },
+        ),
+      ],
+      redirect: (context, state) {
+        final auth = FirebaseAuth.instance.currentUser;
+        final loggingIn = state.matchedLocation == AppRoutes.login ||
+            state.matchedLocation == AppRoutes.register ||
+            state.matchedLocation == AppRoutes.welcome ||
+            state.matchedLocation == AppRoutes.splash;
+
+        if (auth == null && !loggingIn) {
+          return AppRoutes.welcome;
+        }
+        if (auth != null &&
+            (state.matchedLocation == AppRoutes.login ||
+                state.matchedLocation == AppRoutes.register ||
+                state.matchedLocation == AppRoutes.welcome)) {
+          return AppRoutes.home;
+        }
+
+        return null;
+      },
+    );
+  }
+}
+
+class AppBlocScope extends StatelessWidget {
+  const AppBlocScope({required this.child, super.key});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<AuthSessionCubit>(create: (_) => AuthSessionCubit()),
+        BlocProvider<SignInCubit>(create: (_) => SignInCubit()),
+        BlocProvider<SignUpCubit>(create: (_) => SignUpCubit()),
+        BlocProvider<GoogleSignInCubit>(create: (_) => GoogleSignInCubit()),
+        BlocProvider<QuizCubit>(create: (_) => QuizCubit()),
+        BlocProvider<ItineraryCubit>(create: (_) => ItineraryCubit()),
+      ],
+      child: child,
+    );
+  }
+}
+
+class GoRouterRefreshStream extends ChangeNotifier {
+  GoRouterRefreshStream(Stream<dynamic> stream) {
+    _subscription = stream.listen((_) {
+      notifyListeners();
+    });
+  }
+
+  late final StreamSubscription<dynamic> _subscription;
+
+  @override
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
+  }
+}

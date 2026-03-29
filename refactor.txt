@@ -1,0 +1,320 @@
+أنا بفكر في flow كالاتي
+ممكن اليوزر بعد ما يسجل دخول ينتقل لصفحة تسأله كام سؤال عام 
+ممكن مثلا خمس أسألة اختيارية
+وبعد كده سؤال اخير نصي يكتبه هو بإيده 
+والداتا دي تتبعت لل ai model ويرجع لي ريزبونص على هيئة نص وصور 
+او نص ولينكات صور أنا ممكن اعرضها عندي 
+عايزين برضه صفحة history يكون فيها log لآخر كم كويز عمله
+عايزك مكان هادئ ولا دوشة 
+مدينة وعصري ولا طبيعي وريفي 
+حفلات 
+استكشاف صناعة اماكن 
+عايز تروح كام يوم ، والسعر
+
+وده معلومات التصميم اللي هتحتاجها  ومعاها الصور
+PersonaPath Design System & Specs
+
+This document outlines the visual language and reusable components for the PersonaPath mobile application.
+
+1. Color Palette
+
+The brand uses a warm, adventurous palette with high contrast for accessibility.
+
+
+
+
+
+Primary (Brand): #f27f0d (Vibrant Orange) - Used for primary CTAs, progress bars, and active states.
+
+
+
+Secondary/Background: #FAF7F2 (Creamy Off-White) - Primary background color for a soft, premium feel.
+
+
+
+Accent (Dark): #1A1A1A (Deep Charcoal) - Used for primary text and headings.
+
+
+
+Neutral (Gray): #666666 (Medium Gray) - Used for secondary text and icons.
+
+
+
+Card Background: #FFFFFF (Pure White) - Used for elevation on the creamy background.
+
+2. Typography (Font: Plus Jakarta Sans)
+
+We use a modern, geometric sans-serif font for readability and a contemporary look.
+
+
+
+
+
+Heading 1 (H1): 28px / Bold / #1A1A1A (e.g., Screen titles)
+
+
+
+Heading 2 (H2): 20px / Bold / #1A1A1A (e.g., Section headers)
+
+
+
+Body (Large): 16px / Semi-Bold / #1A1A1A (e.g., Activity titles)
+
+
+
+Body (Regular): 14px / Regular / #666666 (e.g., Descriptions, timestamps)
+
+
+
+Caption: 12px / Medium / Uppercase / #f27f0d (e.g., Labels like "AI CURATED")
+
+3. Spacing & Grid
+
+
+
+
+
+Standard Padding: 20px (left/right screen margins).
+
+
+
+Section Spacing: 32px between major blocks.
+
+
+
+Element Spacing: 12px - 16px within cards or groups.
+
+
+
+Border Radius: 12px (ROUND_TWELVE) used for buttons, cards, and input fields for a friendly, approachable UI.
+
+4. Components & Dimensions
+
+
+
+
+
+Primary Button: 
+
+
+
+
+
+Height: 56px
+
+
+
+Width: Full (minus margins)
+
+
+
+Background: #f27f0d
+
+
+
+Text: White, Semi-Bold, 16px
+
+
+
+Question Cards (Quiz):
+
+
+
+
+
+Padding: 16px
+
+
+
+Border: 1px Solid #FFE5D1 (Light version of primary)
+
+
+
+Bottom Navigation Bar:
+
+
+
+
+
+Height: 80px
+
+
+
+Icon size: 24px
+
+
+
+Text: 12px Regular
+
+5. Icons (Icon Set: Phosphor or Lucide)
+
+Common icons used across the app:
+
+
+
+
+
+House: Home
+
+
+
+ClockCounterClockwise: History
+
+
+
+UserCircle: Profile
+
+
+
+CaretLeft: Back Navigation
+
+
+
+Compass: Branding/Start Journey
+
+
+
+MapPin: Location
+
+
+
+MagnifyingGlass: Search
+c:\Users\Ahmed\Downloads\1.png c:\Users\Ahmed\Downloads\history.png c:\Users\Ahmed\Downloads\screen.png
+
+ودي بيانات الفاير بيز داتا بيز من فضلك لما اليوزر يسجل في نفس العملية لو نجحت خلي بيانات تتسجل في الفايرستور 
+Document ID: user uid (يعني UID من Firebase Auth)
+الحقول:
+displayName: string
+email: string
+preferredTravelStyle: string (ده الـ "Persona" اللي المستخدم اختاره)
+quizAnswers: map (object) ← ده أهم حقل، فيه إجابات الـ quiz كاملة
+
+
+ثاني كولكشن: itineraries
+
+Document ID: zS2civIS7DAEFJ4mvZIZ (Auto-generated ID)
+الحقول:
+title: string
+description: string
+days: string (أو number، بس مكتوب string في الـ console)
+generatedAt: timestamp (مثال: March 11, 2026 at 12:00:00 AM UTC+2)
+imageUrls: map (فيه مفتاح "0" يعني array مخزن كـ map، أو array حقيقي)
+userId: string (رابط للـ user)
+activities: map (أهم حقل، فيه الـ schedule كامل: أنشطة كل يوم، أماكن، إلخ)
+وده مثال لعملية تسجيل الدخول 
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:week2/auth/sign_in/sign_in_state.dart';
+
+class SignInCubit extends Cubit<SignInState> {
+  SignInCubit() : super(SignInInitial());
+
+  Future<void> signInWithEmailAndPassword(String email, String password) async {
+    emit(SignInLoading());
+    try {
+      final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email.trim(),
+        password: password.trim(),
+      );
+
+      final user = credential.user;
+      if (user == null) {
+        emit(SignInFailure('Sign in failed. Please try again.'));
+        return;
+      }
+
+      emit(SignInSuccess(user));
+    } on FirebaseAuthException catch (e) {
+      emit(SignInFailure(e.message ?? 'An error occurred. Please try again.'));
+    } catch (e) {
+      emit(SignInFailure('An error occurred: $e'));
+    }
+  }
+}
+import 'package:firebase_auth/firebase_auth.dart';
+
+abstract class SignInState {}
+
+class SignInInitial extends SignInState {}
+
+class SignInLoading extends SignInState {}
+
+class SignInSuccess extends SignInState {
+  SignInSuccess(this.user);
+
+  final User user;
+}
+
+class SignInFailure extends SignInState {
+  SignInFailure(this.message);
+
+  final String message;
+}
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:week2/auth/sign_up/sign_up_state.dart';
+
+class SignUpCubit extends Cubit<SignUpState> {
+  SignUpCubit() : super(SignUpInitial());
+
+  Future<void> signUpWithEmailAndPassword({
+    required String name,
+    required String email,
+    required String password,
+  }) async {
+    emit(SignUpLoading());
+
+    try {
+      final credential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
+            email: email.trim(),
+            password: password.trim(),
+          );
+
+      final user = credential.user;
+      if (user == null) {
+        emit(SignUpFailure('Sign up failed. Please try again.'));
+        return;
+      }
+
+      await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+        'uid': user.uid,
+        'name': name.trim(),
+        'email': email.trim(),
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+
+      emit(SignUpSuccess(user));
+    } on FirebaseAuthException catch (e) {
+      emit(SignUpFailure(e.message ?? 'An error occurred. Please try again.'));
+    } on FirebaseException catch (e) {
+      emit(SignUpFailure(e.message ?? 'Could not save user to Firestore.'));
+    } catch (e) {
+      emit(SignUpFailure('An error occurred: $e'));
+    }
+  }
+}
+import 'package:firebase_auth/firebase_auth.dart';
+
+abstract class SignUpState {}
+
+class SignUpInitial extends SignUpState {}
+
+class SignUpLoading extends SignUpState {}
+
+class SignUpSuccess extends SignUpState {
+  SignUpSuccess(this.user);
+
+  final User user;
+}
+
+class SignUpFailure extends SignUpState {
+  SignUpFailure(this.message);
+
+  final String message;
+}
+عايز كود واضح وبسيط ومتقسم وخلي الكونسنتس ابسط من كدخ 
+عندك ال api key في المشروع حاول تحطه في ملف environment 
+واستعمل go router في النافجيشن ووفر الكيوبت صح في مكانه في التري 
+وخلي الباك جراوند ايمدج اوضح منغير اي طبقة تقليل تبقى شفافة بالكامل في صفح تسجيل الدخول 
