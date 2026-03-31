@@ -1,4 +1,6 @@
-﻿import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+import '../../core/utils/image_url_utils.dart';
 
 class Itinerary {
   final String id;
@@ -9,6 +11,7 @@ class Itinerary {
   final List<ActivityItem> activities;
   final List<String> imageUrls;
   final DateTime generatedAt;
+  final Map<String, dynamic> quizAnswers;
 
   Itinerary({
     required this.id,
@@ -19,6 +22,7 @@ class Itinerary {
     required this.activities,
     required this.imageUrls,
     required this.generatedAt,
+    required this.quizAnswers,
   });
 
   factory Itinerary.fromMap(String id, Map<String, dynamic> map) {
@@ -32,22 +36,6 @@ class Itinerary {
       parsed = DateTime.now();
     }
 
-    bool isAllowedImageUrl(String url) {
-      final u = url.trim();
-      if (!(u.startsWith('http://') || u.startsWith('https://'))) return false;
-      final host = Uri.tryParse(u)?.host ?? '';
-      return host.contains('picsum.photos');
-    }
-
-    List<String> seededPicsumUrls(String seed) {
-      final s = seed.trim().isEmpty ? 'personapath' : seed.trim();
-      return [
-        'https://picsum.photos/seed/${Uri.encodeComponent(s)}/800/600',
-        'https://picsum.photos/seed/${Uri.encodeComponent('${s}2')}/800/600',
-        'https://picsum.photos/seed/${Uri.encodeComponent('${s}3')}/800/600',
-      ];
-    }
-
     final storedUrls = (map['imageUrls'] as List<dynamic>? ?? const [])
         .whereType<String>()
         .map((e) => e.trim())
@@ -58,6 +46,11 @@ class Itinerary {
 
     final seed = '${map['userId'] ?? ''}_${map['title'] ?? ''}_$id';
     final rawUrls = storedUrls.isNotEmpty ? storedUrls : seededPicsumUrls(seed);
+
+    final quizAnswers = <String, dynamic>{};
+    if (map['quizAnswers'] is Map) {
+      quizAnswers.addAll(Map<String, dynamic>.from(map['quizAnswers'] as Map));
+    }
 
     return Itinerary(
       id: id,
@@ -70,6 +63,7 @@ class Itinerary {
           .toList(),
       imageUrls: rawUrls,
       generatedAt: parsed,
+      quizAnswers: quizAnswers,
     );
   }
 
@@ -82,6 +76,7 @@ class Itinerary {
       'activities': activities.map((e) => e.toMap()).toList(),
       'imageUrls': imageUrls,
       'generatedAt': generatedAt,
+      'quizAnswers': quizAnswers,
     };
   }
 }
@@ -115,5 +110,21 @@ class ActivityItem {
       'title': title,
       'note': note,
     };
+  }
+}
+
+extension ItineraryCopyWith on Itinerary {
+  Itinerary copyWithId(String id) {
+    return Itinerary(
+      id: id,
+      userId: userId,
+      title: title,
+      description: description,
+      days: days,
+      activities: activities,
+      imageUrls: imageUrls,
+      generatedAt: generatedAt,
+      quizAnswers: quizAnswers,
+    );
   }
 }

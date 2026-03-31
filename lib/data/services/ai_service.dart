@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:persona_path/core/constants.dart';
 
 import '../../core/config/env.dart';
+import '../../core/utils/image_url_utils.dart';
 
 import '../models/itinerary.dart';
 
@@ -33,8 +34,10 @@ class AiService {
       return _mockItinerary(userId, answers);
     }
 
-    final prompt = AppPrompts.itineraryPrompt
-        .replaceAll('[answers]', jsonEncode(answers));
+    final prompt = AppPrompts.itineraryPrompt.replaceAll(
+      '[answers]',
+      jsonEncode(answers),
+    );
 
     final response = await http.post(
       uri,
@@ -53,7 +56,7 @@ class AiService {
     try {
       final decoded = jsonDecode(response.body) as Map<String, dynamic>;
       final jsonMap = _extractJson(decoded);
-      return _fromAiResponse(userId, jsonMap);
+      return _fromAiResponse(userId, jsonMap, answers);
     } catch (_) {
       return _mockItinerary(userId, answers);
     }
@@ -66,10 +69,10 @@ class AiService {
         'contents': [
           {
             'parts': [
-              {'text': prompt}
-            ]
-          }
-        ]
+              {'text': prompt},
+            ],
+          },
+        ],
       });
     }
 
@@ -82,7 +85,9 @@ class AiService {
       if (candidates.isNotEmpty) {
         final content = candidates.first['content'];
         final parts = content?['parts'] as List<dynamic>?;
-        final text = parts?.isNotEmpty == true ? parts!.first['text'] as String : '';
+        final text = parts?.isNotEmpty == true
+            ? parts!.first['text'] as String
+            : '';
         if (text.isNotEmpty) {
           return jsonDecode(_cleanJson(text)) as Map<String, dynamic>;
         }
@@ -100,7 +105,11 @@ class AiService {
     return cleaned;
   }
 
-  Itinerary _fromAiResponse(String userId, Map<String, dynamic> map) {
+  Itinerary _fromAiResponse(
+    String userId,
+    Map<String, dynamic> map,
+    Map<String, dynamic> answers,
+  ) {
     final urls = <String>[];
     final imageUrls = map['imageUrls'];
     if (imageUrls is List) {
@@ -114,12 +123,14 @@ class AiService {
     final cleanedUrls = urls
         .map((e) => e.trim())
         .where((e) => e.isNotEmpty && !e.contains('example.com'))
-        .where(_isAllowedImageUrl)
+        .where(isAllowedImageUrl)
         .toSet()
         .toList();
 
     final seed = '${userId}_${(map['title'] ?? '').toString()}';
-    final finalUrls = cleanedUrls.isNotEmpty ? cleanedUrls : _seededPicsumUrls(seed);
+    final finalUrls = cleanedUrls.isNotEmpty
+        ? cleanedUrls
+        : seededPicsumUrls(seed);
 
     return Itinerary(
       id: '',
@@ -132,6 +143,7 @@ class AiService {
           .toList(),
       imageUrls: finalUrls,
       generatedAt: DateTime.now(),
+      quizAnswers: Map<String, dynamic>.from(answers),
     );
   }
 
@@ -140,7 +152,8 @@ class AiService {
       id: '',
       userId: userId,
       title: 'Cairo & Alexandria Escape',
-      description: 'A relaxed 5-day plan that mixes history, food, and sea views.',
+      description:
+          'A relaxed 5-day plan that mixes history, food, and sea views.',
       days: const [
         'Day 1: Old Cairo',
         'Day 2: The Pyramids',
@@ -149,14 +162,40 @@ class AiService {
         'Day 5: Markets & Souvenirs',
       ],
       activities: const [
-        ActivityItem(day: 'Day 1', time: '09:00', title: 'Khan El-Khalili', note: 'Start with a calm walk.'),
-        ActivityItem(day: 'Day 2', time: '10:00', title: 'Giza Plateau', note: 'Sunrise photos & camel ride.'),
-        ActivityItem(day: 'Day 3', time: '12:00', title: 'Corniche', note: 'Sea breeze lunch.'),
-        ActivityItem(day: 'Day 4', time: '15:00', title: 'Egyptian Museum', note: 'History and art.'),
-        ActivityItem(day: 'Day 5', time: '18:00', title: 'Local Market', note: 'Find unique gifts.'),
+        ActivityItem(
+          day: 'Day 1',
+          time: '09:00',
+          title: 'Khan El-Khalili',
+          note: 'Start with a calm walk.',
+        ),
+        ActivityItem(
+          day: 'Day 2',
+          time: '10:00',
+          title: 'Giza Plateau',
+          note: 'Sunrise photos & camel ride.',
+        ),
+        ActivityItem(
+          day: 'Day 3',
+          time: '12:00',
+          title: 'Corniche',
+          note: 'Sea breeze lunch.',
+        ),
+        ActivityItem(
+          day: 'Day 4',
+          time: '15:00',
+          title: 'Egyptian Museum',
+          note: 'History and art.',
+        ),
+        ActivityItem(
+          day: 'Day 5',
+          time: '18:00',
+          title: 'Local Market',
+          note: 'Find unique gifts.',
+        ),
       ],
       imageUrls: _seededPicsumUrls('mock_${userId}_cairo'),
       generatedAt: DateTime.now(),
+      quizAnswers: Map<String, dynamic>.from(answers),
     );
   }
 }

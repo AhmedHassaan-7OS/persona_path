@@ -8,15 +8,39 @@ import 'itinerary_state.dart';
 export 'itinerary_state.dart';
 
 class ItineraryCubit extends Cubit<ItineraryState> {
-  ItineraryCubit({AiService? aiService, FirestoreService? firestoreService})
+  ItineraryCubit({AiService? aiService, FirestoreRepository? firestoreRepository})
       : _ai = aiService ?? AiService(),
-        _firestore = firestoreService ?? FirestoreService(),
+        _firestore = firestoreRepository ?? FirestoreService(),
         super(const ItineraryState());
 
   final AiService _ai;
-  final FirestoreService _firestore;
+  final FirestoreRepository _firestore;
 
   Future<void> generate(String userId, Map<String, dynamic> answers) async {
+    await _performGenerate(userId, answers);
+  }
+
+  Future<void> generateFromQuiz(String userId, Map<String, dynamic> answers) async {
+    Object? firestoreError;
+    final preferredStyle = answers.values.isNotEmpty ? answers.values.first.toString() : '';
+    try {
+      await _firestore.updateQuizAnswers(
+        uid: userId,
+        quizAnswers: answers,
+        preferredTravelStyle: preferredStyle,
+      );
+    } catch (e) {
+      firestoreError = e;
+    }
+
+    await _performGenerate(userId, answers);
+
+    if (firestoreError != null) {
+      throw firestoreError;
+    }
+  }
+
+  Future<void> _performGenerate(String userId, Map<String, dynamic> answers) async {
     emit(state.copyWith(isLoading: true, error: null));
     try {
       final itinerary = await _ai.generateItinerary(userId: userId, answers: answers);
@@ -39,20 +63,5 @@ class ItineraryCubit extends Cubit<ItineraryState> {
       emit(state.copyWith(isSaving: false, error: e.toString()));
       rethrow;
     }
-  }
-}
-
-extension on Itinerary {
-  Itinerary copyWithId(String id) {
-    return Itinerary(
-      id: id,
-      userId: userId,
-      title: title,
-      description: description,
-      days: days,
-      activities: activities,
-      imageUrls: imageUrls,
-      generatedAt: generatedAt,
-    );
   }
 }

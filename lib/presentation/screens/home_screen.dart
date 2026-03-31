@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/constants.dart';
+import '../../core/utils/string_utils.dart';
 import '../../data/services/firestore_service.dart';
 import '../../data/models/itinerary.dart';
 import '../../data/models/user_profile.dart';
@@ -12,46 +13,53 @@ import '../widgets/primary_button.dart';
 import '../widgets/safe_network_image.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({
+    super.key,
+    this.firestoreService,
+  });
+
+  final FirestoreRepository? firestoreService;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final _firestore = FirestoreService();
+  late final FirestoreRepository _firestore;
+  String? _lastEnsuredUid;
 
   @override
   void initState() {
     super.initState();
+    _firestore = widget.firestoreService ?? FirestoreService();
     _ensureUserDoc();
   }
 
   Future<void> _ensureUserDoc() async {
     final user = context.read<AuthSessionCubit>().state.user;
     if (user == null) return;
+    if (_lastEnsuredUid == user.uid) return;
+    _lastEnsuredUid = user.uid;
     await _firestore.upsertUser(
       uid: user.uid,
       email: user.email ?? '',
-      displayName: user.displayName ?? _fallbackName(user.email ?? ''),
+      displayName: user.displayName ?? resolveFallbackName(user.email),
     );
-  }
-
-  String _fallbackName(String email) {
-    final at = email.indexOf('@');
-    if (at <= 0) return 'Traveler';
-    return email.substring(0, at);
   }
 
   @override
   Widget build(BuildContext context) {
     final user = context.read<AuthSessionCubit>().state.user;
+    final displayName = user?.displayName ?? resolveFallbackName(user?.email);
     final uid = user?.uid ?? '';
     return Scaffold(
       body: SafeArea(
         child: StreamBuilder<List<Itinerary>>(
           stream: uid.isNotEmpty ? _firestore.watchUserItineraries(uid) : const Stream.empty(),
           builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return _buildStreamError(snapshot.error);
+            }
             final itineraries = snapshot.data ?? const <Itinerary>[];
             return ListView(
               padding: const EdgeInsets.all(AppPaddings.screen),
@@ -75,7 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           Text('Your Journey', style: AppTextStyles.title),
                           const SizedBox(height: 2),
                           Text(
-                            'Welcome, ${user?.displayName ?? 'Traveler'}',
+                            'Welcome, $displayName',
                             style: AppTextStyles.bodyGrey,
                           ),
                         ],
@@ -154,6 +162,35 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             );
           },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStreamError(Object? error) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppPaddings.screen),
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Itinerary service unavailable',
+              style: AppTextStyles.subtitle,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              error?.toString() ?? 'Unable to load your plans right now.',
+              textAlign: TextAlign.center,
+              style: AppTextStyles.bodyGrey,
+            ),
+            const SizedBox(height: 12),
+            TextButton(
+              onPressed: () => setState(() {}),
+              child: const Text('Retry'),
+            ),
+          ],
         ),
       ),
     );

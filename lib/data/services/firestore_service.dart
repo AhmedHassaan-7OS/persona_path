@@ -1,13 +1,35 @@
-﻿import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 import '../../core/config/env.dart';
 import '../models/itinerary.dart';
 import '../models/user_profile.dart';
 
-class FirestoreService {
+abstract class FirestoreRepository {
+  Future<void> upsertUser({
+    required String uid,
+    required String email,
+    required String displayName,
+  });
+
+  Future<void> updateQuizAnswers({
+    required String uid,
+    required Map<String, dynamic> quizAnswers,
+    required String preferredTravelStyle,
+  });
+
+  Future<String> saveItinerary(Itinerary itinerary);
+
+  Stream<UserProfile?> watchUserProfile(String uid);
+
+  Stream<List<Itinerary>> watchUserItineraries(String uid);
+
+  Future<Itinerary?> getItineraryById(String id);
+}
+
+class FirestoreService implements FirestoreRepository {
   FirestoreService({FirebaseFirestore? firestore})
-    : _firestore = firestore ?? _createFirestore();
+      : _firestore = firestore ?? _createFirestore();
 
   final FirebaseFirestore _firestore;
 
@@ -23,6 +45,7 @@ class FirestoreService {
     );
   }
 
+  @override
   Future<void> upsertUser({
     required String uid,
     required String email,
@@ -38,6 +61,7 @@ class FirestoreService {
     }, SetOptions(merge: true));
   }
 
+  @override
   Future<void> updateQuizAnswers({
     required String uid,
     required Map<String, dynamic> quizAnswers,
@@ -49,6 +73,7 @@ class FirestoreService {
     }, SetOptions(merge: true));
   }
 
+  @override
   Stream<UserProfile?> watchUserProfile(String uid) {
     if (uid.trim().isEmpty) return const Stream<UserProfile?>.empty();
     return _firestore.collection('users').doc(uid).snapshots().map((doc) {
@@ -58,13 +83,13 @@ class FirestoreService {
     });
   }
 
+  @override
   Future<String> saveItinerary(Itinerary itinerary) async {
-    final doc = await _firestore
-        .collection('itineraries')
-        .add(itinerary.toMap());
+    final doc = await _firestore.collection('itineraries').add(itinerary.toMap());
     return doc.id;
   }
 
+  @override
   Stream<List<Itinerary>> watchUserItineraries(String uid) {
     return _firestore
         .collection('itineraries')
@@ -78,6 +103,7 @@ class FirestoreService {
         });
   }
 
+  @override
   Future<Itinerary?> getItineraryById(String id) async {
     final doc = await _firestore.collection('itineraries').doc(id).get();
     if (!doc.exists) return null;

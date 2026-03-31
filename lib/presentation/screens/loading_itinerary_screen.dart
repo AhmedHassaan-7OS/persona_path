@@ -1,9 +1,8 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/constants.dart';
-import '../../data/services/firestore_service.dart';
 import '../cubit/auth/auth_session_cubit.dart';
 import '../cubit/itinerary/itinerary_cubit.dart';
 import '../cubit/quiz/quiz_cubit.dart';
@@ -16,7 +15,6 @@ class LoadingItineraryScreen extends StatefulWidget {
 }
 
 class _LoadingItineraryScreenState extends State<LoadingItineraryScreen> {
-  final _firestore = FirestoreService();
   bool _cancelled = false;
 
   @override
@@ -36,29 +34,12 @@ class _LoadingItineraryScreenState extends State<LoadingItineraryScreen> {
       return;
     }
 
-    final preferredStyle = quiz.values.isNotEmpty ? quiz.values.first.toString() : '';
-
     try {
-      await _firestore.updateQuizAnswers(
-        uid: auth.uid,
-        quizAnswers: quiz,
-        preferredTravelStyle: preferredStyle,
-      );
+      await itineraryCubit.generateFromQuiz(auth.uid, quiz);
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Firestore error: $e')),
-        );
-      }
-    }
-
-    try {
-      await itineraryCubit.generate(auth.uid, quiz);
-    } catch (e) {
-      // ItineraryCubit already captures errors, just continue to result.
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('AI error: $e')),
+          SnackBar(content: Text('Save error: $e')),
         );
       }
     }
