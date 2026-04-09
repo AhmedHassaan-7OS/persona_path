@@ -1,8 +1,7 @@
 class Option {
   final String title;
-  final String? imageUrl;
-
-  const Option({required this.title, this.imageUrl});
+  // imageUrl removed
+  const Option({required this.title});
 }
 
 class Question {

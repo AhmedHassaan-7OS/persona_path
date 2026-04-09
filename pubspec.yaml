@@ -37,6 +37,7 @@ dependencies:
     sdk: flutter
   flutter_bloc: ^9.1.1
   flutter_dotenv: ^5.2.1
+  flutter_native_splash: ^2.4.4
   go_router: ^16.0.0
   google_sign_in: ^7.2.0
   http: ^0.13.6
@@ -85,3 +86,11 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+flutter_native_splash:
+  color: "#FFFFFF"
+  image: assets/icons/personapathicon.png
+  android_12:
+    image: assets/icons/personapathicon.png
+    color: "#FFFFFF"
+    icon_background_color: "#FFFFFF"

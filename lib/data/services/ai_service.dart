@@ -4,26 +4,9 @@ import 'package:http/http.dart' as http;
 import 'package:persona_path/core/constants.dart';
 
 import '../../core/config/env.dart';
-import '../../core/utils/image_url_utils.dart';
-
 import '../models/itinerary.dart';
 
 class AiService {
-  static bool _isAllowedImageUrl(String url) {
-    final u = url.trim();
-    if (!(u.startsWith('http://') || u.startsWith('https://'))) return false;
-    final host = Uri.tryParse(u)?.host ?? '';
-    return host.contains('picsum.photos');
-  }
-
-  static List<String> _seededPicsumUrls(String seed) {
-    final s = seed.trim().isEmpty ? 'personapath' : seed.trim();
-    return [
-      'https://picsum.photos/seed/${Uri.encodeComponent(s)}/800/600',
-      'https://picsum.photos/seed/${Uri.encodeComponent('${s}2')}/800/600',
-      'https://picsum.photos/seed/${Uri.encodeComponent('${s}3')}/800/600',
-    ];
-  }
 
   Future<Itinerary> generateItinerary({
     required String userId,
@@ -110,28 +93,6 @@ class AiService {
     Map<String, dynamic> map,
     Map<String, dynamic> answers,
   ) {
-    final urls = <String>[];
-    final imageUrls = map['imageUrls'];
-    if (imageUrls is List) {
-      urls.addAll(imageUrls.whereType<String>());
-    }
-    final imageUrl = map['imageUrl'];
-    if (imageUrl is String && imageUrl.trim().isNotEmpty) {
-      urls.add(imageUrl.trim());
-    }
-
-    final cleanedUrls = urls
-        .map((e) => e.trim())
-        .where((e) => e.isNotEmpty && !e.contains('example.com'))
-        .where(isAllowedImageUrl)
-        .toSet()
-        .toList();
-
-    final seed = '${userId}_${(map['title'] ?? '').toString()}';
-    final finalUrls = cleanedUrls.isNotEmpty
-        ? cleanedUrls
-        : seededPicsumUrls(seed);
-
     return Itinerary(
       id: '',
       userId: userId,
@@ -141,7 +102,6 @@ class AiService {
       activities: (map['activities'] as List<dynamic>? ?? const [])
           .map((e) => ActivityItem.fromMap(e))
           .toList(),
-      imageUrls: finalUrls,
       generatedAt: DateTime.now(),
       quizAnswers: Map<String, dynamic>.from(answers),
     );
@@ -152,8 +112,7 @@ class AiService {
       id: '',
       userId: userId,
       title: 'Cairo & Alexandria Escape',
-      description:
-          'A relaxed 5-day plan that mixes history, food, and sea views.',
+      description: 'A relaxed 5-day plan that mixes history, food, and sea views.',
       days: const [
         'Day 1: Old Cairo',
         'Day 2: The Pyramids',
@@ -162,38 +121,12 @@ class AiService {
         'Day 5: Markets & Souvenirs',
       ],
       activities: const [
-        ActivityItem(
-          day: 'Day 1',
-          time: '09:00',
-          title: 'Khan El-Khalili',
-          note: 'Start with a calm walk.',
-        ),
-        ActivityItem(
-          day: 'Day 2',
-          time: '10:00',
-          title: 'Giza Plateau',
-          note: 'Sunrise photos & camel ride.',
-        ),
-        ActivityItem(
-          day: 'Day 3',
-          time: '12:00',
-          title: 'Corniche',
-          note: 'Sea breeze lunch.',
-        ),
-        ActivityItem(
-          day: 'Day 4',
-          time: '15:00',
-          title: 'Egyptian Museum',
-          note: 'History and art.',
-        ),
-        ActivityItem(
-          day: 'Day 5',
-          time: '18:00',
-          title: 'Local Market',
-          note: 'Find unique gifts.',
-        ),
+        ActivityItem(day: 'Day 1', time: '09:00', title: 'Khan El-Khalili', note: 'Start with a calm walk.'),
+        ActivityItem(day: 'Day 2', time: '10:00', title: 'Giza Plateau', note: 'Sunrise photos & camel ride.'),
+        ActivityItem(day: 'Day 3', time: '12:00', title: 'Corniche', note: 'Sea breeze lunch.'),
+        ActivityItem(day: 'Day 4', time: '15:00', title: 'Egyptian Museum', note: 'History and art.'),
+        ActivityItem(day: 'Day 5', time: '18:00', title: 'Local Market', note: 'Find unique gifts.'),
       ],
-      imageUrls: _seededPicsumUrls('mock_${userId}_cairo'),
       generatedAt: DateTime.now(),
       quizAnswers: Map<String, dynamic>.from(answers),
     );

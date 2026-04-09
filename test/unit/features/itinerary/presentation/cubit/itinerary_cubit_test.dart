@@ -45,7 +45,8 @@ class FakeFirestoreRepository implements FirestoreRepository {
   Stream<UserProfile?> watchUserProfile(String uid) => const Stream.empty();
 
   @override
-  Stream<List<Itinerary>> watchUserItineraries(String uid) => const Stream.empty();
+  Stream<List<Itinerary>> watchUserItineraries(String uid) =>
+      const Stream.empty();
 
   @override
   Future<Itinerary?> getItineraryById(String id) async => null;
@@ -61,7 +62,6 @@ void main() {
       description: 'Desc',
       days: const ['Day 1'],
       activities: const [],
-      imageUrls: const [],
       generatedAt: DateTime.now(),
       quizAnswers: answers,
     );

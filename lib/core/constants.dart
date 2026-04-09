@@ -113,8 +113,13 @@ class AppRoutes {
 }
 
 class AppPrompts {
+  // imageUrls removed - AI returns text only
   static const String itineraryPrompt =
-      'You are a professional travel expert. Use the quiz answers to create a 5-day personalized itinerary. Return ONLY valid JSON with this exact shape: {"title": "...", "description": "...", "days": ["Day 1..."], "activities": [{"day":"Day 1","time":"09:00","title":"...","note":"..."}], "imageUrls": ["https://...", "https://..."]}. Do not include any extra text, markdown, or explanations. IMPORTANT: imageUrls must be real, publicly accessible https URLs (prefer images.unsplash.com). Never use example.com or placeholder domains. Answers: [answers]';
+      'You are a professional travel expert. Use the quiz answers to create a 5-day personalized itinerary. '
+      'Return ONLY valid JSON with this exact shape: '
+      '{"title": "...", "description": "...", "days": ["Day 1..."], '
+      '"activities": [{"day":"Day 1","time":"09:00","title":"...","note":"..."}]}. '
+      'Do not include any extra text, markdown, or explanations. Answers: [answers]';
 }
 
 class AppQuiz {
@@ -122,76 +127,36 @@ class AppQuiz {
     QuizQuestionData(
       title: 'What kind of morning feels perfect to you?',
       options: [
-        QuizOptionData(
-          title: 'Quiet Sunrise Hike',
-          imageUrl:
-              'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee',
-        ),
-        QuizOptionData(
-          title: 'Bustling Local Market',
-          imageUrl:
-              'https://images.unsplash.com/photo-1489515217757-5fd1be406fef',
-        ),
+        QuizOptionData(title: 'Quiet Sunrise Hike'),
+        QuizOptionData(title: 'Bustling Local Market'),
       ],
     ),
     QuizQuestionData(
       title: 'Your ideal afternoon is...',
       options: [
-        QuizOptionData(
-          title: 'Museum & History',
-          imageUrl:
-              'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429',
-        ),
-        QuizOptionData(
-          title: 'Food Tasting',
-          imageUrl:
-              'https://images.unsplash.com/photo-1504674900247-0877df9cc836',
-        ),
+        QuizOptionData(title: 'Museum & History'),
+        QuizOptionData(title: 'Food Tasting'),
       ],
     ),
     QuizQuestionData(
       title: 'Pick your travel pace',
       options: [
-        QuizOptionData(
-          title: 'Relaxed & Slow',
-          imageUrl:
-              'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee',
-        ),
-        QuizOptionData(
-          title: 'Active & Packed',
-          imageUrl:
-              'https://images.unsplash.com/photo-1473625247510-8ceb1760943f',
-        ),
+        QuizOptionData(title: 'Relaxed & Slow'),
+        QuizOptionData(title: 'Active & Packed'),
       ],
     ),
     QuizQuestionData(
       title: 'Choose your favorite scenery',
       options: [
-        QuizOptionData(
-          title: 'Mountains',
-          imageUrl:
-              'https://images.unsplash.com/photo-1469474968028-56623f02e42e',
-        ),
-        QuizOptionData(
-          title: 'Coast & Sea',
-          imageUrl:
-              'https://images.unsplash.com/photo-1507525428034-b723cf961d3e',
-        ),
+        QuizOptionData(title: 'Mountains'),
+        QuizOptionData(title: 'Coast & Sea'),
       ],
     ),
     QuizQuestionData(
       title: 'Your evening vibe',
       options: [
-        QuizOptionData(
-          title: 'Quiet Cafe',
-          imageUrl:
-              'https://images.unsplash.com/photo-1445116572660-236099ec97a0',
-        ),
-        QuizOptionData(
-          title: 'Live Music',
-          imageUrl:
-              'https://images.unsplash.com/photo-1506157786151-b8491531f063',
-        ),
+        QuizOptionData(title: 'Quiet Cafe'),
+        QuizOptionData(title: 'Live Music'),
       ],
     ),
   ];
@@ -209,10 +174,6 @@ class QuizQuestionData {
 
 class QuizOptionData {
   final String title;
-  final String imageUrl;
-
-  const QuizOptionData({
-    required this.title,
-    required this.imageUrl,
-  });
+  // imageUrl removed - image feature removed
+  const QuizOptionData({required this.title});
 }

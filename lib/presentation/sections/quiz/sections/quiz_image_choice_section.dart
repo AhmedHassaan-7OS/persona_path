@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/constants.dart';
-import '../../../widgets/safe_network_image.dart';
 
+// Images removed - now text-only cards like quiz_drive_section
 class QuizImageChoiceSection extends StatelessWidget {
   const QuizImageChoiceSection({
     required this.selected,
@@ -27,18 +27,18 @@ class QuizImageChoiceSection extends StatelessWidget {
         Row(
           children: [
             Expanded(
-              child: _ImageChoiceCard(
+              child: _TextChoiceCard(
                 title: a.title,
-                imageUrl: a.imageUrl,
+                icon: Icons.wb_sunny_outlined,
                 selected: selected == a.title,
                 onTap: () => onSelected(a.title),
               ),
             ),
             const SizedBox(width: 12),
             Expanded(
-              child: _ImageChoiceCard(
+              child: _TextChoiceCard(
                 title: b.title,
-                imageUrl: b.imageUrl,
+                icon: Icons.storefront_outlined,
                 selected: selected == b.title,
                 onTap: () => onSelected(b.title),
               ),
@@ -50,16 +50,16 @@ class QuizImageChoiceSection extends StatelessWidget {
   }
 }
 
-class _ImageChoiceCard extends StatelessWidget {
-  const _ImageChoiceCard({
+class _TextChoiceCard extends StatelessWidget {
+  const _TextChoiceCard({
     required this.title,
-    required this.imageUrl,
+    required this.icon,
     required this.selected,
     required this.onTap,
   });
 
   final String title;
-  final String imageUrl;
+  final IconData icon;
   final bool selected;
   final VoidCallback onTap;
 
@@ -69,45 +69,22 @@ class _ImageChoiceCard extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(AppRadius.medium),
       child: Container(
-        height: 132,
+        height: 88,
         decoration: BoxDecoration(
+          color: AppColors.white,
           borderRadius: BorderRadius.circular(AppRadius.medium),
           border: Border.all(
             color: selected ? AppColors.primaryOrange : const Color(0xFFFFE5D1),
             width: selected ? 2 : 1,
           ),
         ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(AppRadius.medium),
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              SafeNetworkImage(url: imageUrl, fit: BoxFit.cover),
-              Align(
-                alignment: Alignment.bottomLeft,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Color(0x00000000),
-                        Color(0xAA000000),
-                      ],
-                    ),
-                  ),
-                  child: Text(
-                    title,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: AppColors.primaryOrange),
+            const SizedBox(height: 8),
+            Text(title, style: AppTextStyles.body, textAlign: TextAlign.center),
+          ],
         ),
       ),
     );

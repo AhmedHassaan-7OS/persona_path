@@ -1,7 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import '../../core/utils/image_url_utils.dart';
-
 class Itinerary {
   final String id;
   final String userId;
@@ -9,7 +7,6 @@ class Itinerary {
   final String description;
   final List<String> days;
   final List<ActivityItem> activities;
-  final List<String> imageUrls;
   final DateTime generatedAt;
   final Map<String, dynamic> quizAnswers;
 
@@ -20,7 +17,6 @@ class Itinerary {
     required this.description,
     required this.days,
     required this.activities,
-    required this.imageUrls,
     required this.generatedAt,
     required this.quizAnswers,
   });
@@ -36,17 +32,6 @@ class Itinerary {
       parsed = DateTime.now();
     }
 
-    final storedUrls = (map['imageUrls'] as List<dynamic>? ?? const [])
-        .whereType<String>()
-        .map((e) => e.trim())
-        .where((e) => e.isNotEmpty && !e.contains('example.com'))
-        .where(isAllowedImageUrl)
-        .toSet()
-        .toList();
-
-    final seed = '${map['userId'] ?? ''}_${map['title'] ?? ''}_$id';
-    final rawUrls = storedUrls.isNotEmpty ? storedUrls : seededPicsumUrls(seed);
-
     final quizAnswers = <String, dynamic>{};
     if (map['quizAnswers'] is Map) {
       quizAnswers.addAll(Map<String, dynamic>.from(map['quizAnswers'] as Map));
@@ -61,7 +46,6 @@ class Itinerary {
       activities: (map['activities'] as List<dynamic>? ?? const [])
           .map((e) => ActivityItem.fromMap(e))
           .toList(),
-      imageUrls: rawUrls,
       generatedAt: parsed,
       quizAnswers: quizAnswers,
     );
@@ -74,7 +58,6 @@ class Itinerary {
       'description': description,
       'days': days,
       'activities': activities.map((e) => e.toMap()).toList(),
-      'imageUrls': imageUrls,
       'generatedAt': generatedAt,
       'quizAnswers': quizAnswers,
     };
@@ -122,7 +105,6 @@ extension ItineraryCopyWith on Itinerary {
       description: description,
       days: days,
       activities: activities,
-      imageUrls: imageUrls,
       generatedAt: generatedAt,
       quizAnswers: quizAnswers,
     );

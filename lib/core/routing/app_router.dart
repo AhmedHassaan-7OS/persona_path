@@ -25,21 +25,16 @@ import '../../presentation/screens/quiz_result_screen.dart';
 import '../../presentation/screens/quiz_screen.dart';
 import '../../presentation/screens/quiz_text_screen.dart';
 import '../../presentation/screens/register_screen.dart';
-import '../../presentation/screens/splash_screen.dart';
 import '../../presentation/screens/welcome_screen.dart';
 
 class AppRouter {
   static GoRouter createRouter() {
     return GoRouter(
-      initialLocation: AppRoutes.splash,
+      initialLocation: AppRoutes.welcome,
       refreshListenable: GoRouterRefreshStream(
         FirebaseAuth.instance.authStateChanges(),
       ),
       routes: <RouteBase>[
-        GoRoute(
-          path: AppRoutes.splash,
-          builder: (context, state) => const SplashScreen(),
-        ),
         GoRoute(
           path: AppRoutes.welcome,
           builder: (context, state) => const WelcomeScreen(),
@@ -123,21 +118,12 @@ class AppRouter {
       ],
       redirect: (context, state) {
         final auth = FirebaseAuth.instance.currentUser;
-        final loggingIn = state.matchedLocation == AppRoutes.login ||
+        final isPublic = state.matchedLocation == AppRoutes.login ||
             state.matchedLocation == AppRoutes.register ||
-            state.matchedLocation == AppRoutes.welcome ||
-            state.matchedLocation == AppRoutes.splash;
+            state.matchedLocation == AppRoutes.welcome;
 
-        if (auth == null && !loggingIn) {
-          return AppRoutes.welcome;
-        }
-        if (auth != null &&
-            (state.matchedLocation == AppRoutes.login ||
-                state.matchedLocation == AppRoutes.register ||
-                state.matchedLocation == AppRoutes.welcome)) {
-          return AppRoutes.home;
-        }
-
+        if (auth == null && !isPublic) return AppRoutes.welcome;
+        if (auth != null && isPublic) return AppRoutes.home;
         return null;
       },
     );
