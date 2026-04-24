@@ -2,16 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:async';
-
 import '../constants.dart';
-import 'app_bloc_scope.dart';
 import '../../data/models/user_profile.dart';
-import '../../presentation/cubit/auth/auth_session_cubit.dart';
-import '../../presentation/cubit/auth/google_sign_in_cubit.dart';
-import '../../presentation/cubit/auth/sign_in_cubit.dart';
-import '../../presentation/cubit/auth/sign_up_cubit.dart';
-import '../../presentation/cubit/itinerary/itinerary_cubit.dart';
-import '../../presentation/cubit/quiz/quiz_cubit.dart';
 import '../../presentation/screens/home_screen.dart';
 import '../../presentation/screens/app_shell.dart';
 import '../../presentation/screens/itinerary_detail_screen.dart';
@@ -64,7 +56,9 @@ class AppRouter {
           builder: (context, state) {
             final profile = state.extra;
             if (profile is! UserProfile) {
-              return const Scaffold(body: Center(child: Text('No quiz result.')));
+              return const Scaffold(
+                body: Center(child: Text('No quiz result.')),
+              );
             }
             return QuizResultScreen(profile: profile);
           },
@@ -118,7 +112,8 @@ class AppRouter {
       ],
       redirect: (context, state) {
         final auth = FirebaseAuth.instance.currentUser;
-        final isPublic = state.matchedLocation == AppRoutes.login ||
+        final isPublic =
+            state.matchedLocation == AppRoutes.login ||
             state.matchedLocation == AppRoutes.register ||
             state.matchedLocation == AppRoutes.welcome;
 
