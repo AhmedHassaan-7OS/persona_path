@@ -75,7 +75,7 @@ class QuizScreenBody extends StatelessWidget {
               const SizedBox(height: 24),
               PrimaryButton(
                 label: 'Generate My Itinerary',
-                onPressed: () => context.go(AppRoutes.loading),
+                onPressed: () => context.push(AppRoutes.loading),
               ),
               const SizedBox(height: 12),
             ],

@@ -51,7 +51,7 @@ class _LoadingItineraryScreenState extends State<LoadingItineraryScreen> {
         const SnackBar(content: Text('AI error, showing sample itinerary.')),
       );
     }
-    context.go(AppRoutes.itineraryResult);
+    context.pushReplacement(AppRoutes.itineraryResult);
   }
 
   @override
