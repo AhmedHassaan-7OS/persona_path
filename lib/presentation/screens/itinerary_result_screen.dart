@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
@@ -34,10 +34,7 @@ class ItineraryResultScreen extends StatelessWidget {
                 Text(itinerary.title, style: AppTextStyles.title),
                 const SizedBox(height: 8),
                 Text(itinerary.description, style: AppTextStyles.bodyGrey),
-                if (state.error != null) ...[
-                  const SizedBox(height: 10),
-                  Text(state.error!, style: const TextStyle(color: Colors.red)),
-                ],
+
                 const SizedBox(height: 16),
                 Expanded(
                   child: ListView.separated(

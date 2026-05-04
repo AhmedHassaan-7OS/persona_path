@@ -1,4 +1,4 @@
-﻿import 'dart:convert';
+import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:persona_path/core/constants.dart';
@@ -14,7 +14,7 @@ class AiService {
   }) async {
     final uri = AppEnv.aiUri;
     if (uri == null) {
-      return _mockItinerary(userId, answers);
+      return generateMockItinerary(userId, answers);
     }
 
     final prompt = AppPrompts.itineraryPrompt.replaceAll(
@@ -33,7 +33,7 @@ class AiService {
     );
 
     if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw Exception('AI request failed: ${response.statusCode}');
+      return generateMockItinerary(userId, answers);
     }
 
     try {
@@ -41,7 +41,7 @@ class AiService {
       final jsonMap = _extractJson(decoded);
       return _fromAiResponse(userId, jsonMap, answers);
     } catch (_) {
-      return _mockItinerary(userId, answers);
+      return generateMockItinerary(userId, answers);
     }
   }
 
@@ -107,7 +107,7 @@ class AiService {
     );
   }
 
-  Itinerary _mockItinerary(String userId, Map<String, dynamic> answers) {
+  Itinerary generateMockItinerary(String userId, Map<String, dynamic> answers) {
     return Itinerary(
       id: '',
       userId: userId,

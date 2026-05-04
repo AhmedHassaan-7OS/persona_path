@@ -41,7 +41,7 @@ class ItineraryCubit extends Cubit<ItineraryState> {
   }
 
   Future<void> _performGenerate(String userId, Map<String, dynamic> answers) async {
-    emit(state.copyWith(isLoading: true, error: null));
+    emit(const ItineraryState(isLoading: true));
     try {
       final itinerary = await _ai.generateItinerary(userId: userId, answers: answers);
       emit(state.copyWith(isLoading: false, itinerary: itinerary));
