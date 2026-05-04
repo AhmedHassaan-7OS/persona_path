@@ -97,4 +97,4 @@ Contributions are what make the open-source community such an amazing place to l
 
 ---
 
-Developed with ❤️ by [Ahmed Hassaan](https://github.com/AhmedHassaan-7OS)
+Developed with ❤️
