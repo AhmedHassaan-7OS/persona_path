@@ -28,8 +28,8 @@ class QuizScreenBody extends StatelessWidget {
           'landscape',
           'nightlife',
           'drive',
-          'durationDays',
-          'priceRange',
+          'priceRange', // durationDays is usually always set, priceRange is the second part
+          'freeText',
         }.where((k) => (answers[k] ?? '').toString().trim().isNotEmpty).length;
         final progress = (filled / totalSteps).clamp(0.0, 1.0);
 
@@ -72,9 +72,9 @@ class QuizScreenBody extends StatelessWidget {
                 initialValue: (answers['freeText'] ?? '').toString(),
                 onChanged: (v) => context.read<QuizCubit>().selectAnswer('freeText', v.trim()),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 24),
               PrimaryButton(
-                label: 'Generate My PersonaPath',
+                label: 'Generate My Itinerary',
                 onPressed: () => context.go(AppRoutes.loading),
               ),
               const SizedBox(height: 12),

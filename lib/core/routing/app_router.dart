@@ -15,7 +15,6 @@ import '../../presentation/screens/profile_screen.dart';
 import '../../presentation/screens/quiz_intro_screen.dart';
 import '../../presentation/screens/quiz_result_screen.dart';
 import '../../presentation/screens/quiz_screen.dart';
-import '../../presentation/screens/quiz_text_screen.dart';
 import '../../presentation/screens/register_screen.dart';
 import '../../presentation/screens/welcome_screen.dart';
 
@@ -46,10 +45,6 @@ class AppRouter {
         GoRoute(
           path: AppRoutes.quiz,
           builder: (context, state) => const QuizScreen(),
-        ),
-        GoRoute(
-          path: AppRoutes.quizText,
-          builder: (context, state) => const QuizTextScreen(),
         ),
         GoRoute(
           path: AppRoutes.quizResult,

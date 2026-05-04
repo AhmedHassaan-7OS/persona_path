@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 
 // Core app-wide constants. Keep everything here only.
 
@@ -102,7 +102,6 @@ class AppRoutes {
   static const String register = '/register';
   static const String quizIntro = '/quiz-intro';
   static const String quiz = '/quiz';
-  static const String quizText = '/quiz-text';
   static const String quizResult = '/quiz-result';
   static const String loading = '/loading';
   static const String itineraryResult = '/itinerary-result';
